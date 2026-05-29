@@ -1,0 +1,35 @@
+name: Gerar Executável (Build)
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+    - name: Baixar o código do repositório
+      uses: actions/checkout@v4
+
+    - name: Configurar o Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10.12'
+
+    - name: Instalar Dependências do Projeto
+      run: |
+        python -move pip install --upgrade pip
+        pip install customtkinter psutil py_cpuinfo pyinstaller
+
+    - name: Compilar com PyInstaller
+      run: |
+        pyinstaller --noconsole --onefile --collect-all customtkinter main.py
+
+    - name: Disponibilizar o Executável para Download
+      uses: actions/upload-artifact@v4
+      with:
+        name: cpu-py-windows
+        path: dist/main.exe
