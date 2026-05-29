@@ -10,7 +10,7 @@ def dados_gpu():
 
     if sistema == "Windows":
         try:
-            comando = ["powershell", "-NoProfile", "-Command", "Get-CimInstance Win32_VideoController | ForEach-Object { \"$($_.Name);$($_.AdapterRAM);$($_PNPDeviceID)\" }"]
+            comando = ["powershell", "-NoProfile", "-Command", "Get-CimInstance Win32_VideoController | ForEach-Object { \"$($_.Name);$($_.AdapterRAM);$($_.PNPDeviceID)\" }"]
             saida = subprocess.run(comando, text=True, timeout=5, capture_output=True).stdout
             linhas = formatar_comando(saida)
 

@@ -2,6 +2,7 @@ import platform
 import psutil
 import subprocess
 import os
+import json
 from src.info.utilidades import *
 
 def dados_memoria():
@@ -81,12 +82,16 @@ def dados_placa_mae():
 
     if sistema == "Windows":
         try:
-            comando = ["powershell", "-NoProfile", "-Command", "Get-CimInstance Win32_BaseBoard | Select_Object -ExpandProperty Manufacturer, Product"]
+            comando = ["powershell", "-NoProfile", "-Command", "Get-CimInstance Win32_BaseBoard | Select-Object Manufacturer, Product | ConvertTo-Json"]
             saida = subprocess.run(comando, text=True, capture_output=True, timeout=5, creationflags=subprocess.CREATE_NO_WINDOW).stdout
-            linhas = formatar_comando(saida)
+            dados = json.loads(saida)
 
-            if len(linhas) >= 2:
-                return {"fabricante": linhas[0], "modelo": linhas[1]}
+            fabricante = dados.get("Manufacturer")
+            modelo = dados.get("Product")
+            return {
+                "fabricante": fabricante,
+                "modelo": modelo
+            }
         except Exception:
             return {"fabricante": "Desconhecido", "modelo": "Desconhecido"}
 

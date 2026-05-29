@@ -2,6 +2,7 @@ import psutil
 import cpuinfo
 import platform
 import os
+from src.info.utilidades import *
 
 def dados_cpu():
     info = cpuinfo.get_cpu_info()
@@ -21,7 +22,7 @@ def dados_cache():
 
     if sistema == "Windows":
         try:
-            comando = ["powershell",  "-NoProfile", "-Command", 'Get-CimInstance Win32_CacheMemory | ForEach-Object { "$($_.Level),$($_.InstalledSize)" }']
+            comando = ["powershell",  "-NoProfile", "-Command", 'Get-CimInstance Win32_CacheMemory | ForEach-Object { \"$($_.Level),$($_.InstalledSize)\" }']
             saida = subprocess.run(comando, text=True, timeout=5, capture_output=True).stdout
 
             if saida:
