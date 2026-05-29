@@ -1,8 +1,8 @@
 import platform
 import subprocess
 import os
-import amd_wrapper
-from utilidades import *
+import src.info.amd_wrapper
+from src.info.utilidades import *
 
 def dados_gpu():
     sistema = platform.system()

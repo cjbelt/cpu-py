@@ -3,16 +3,11 @@ import platform
 import os
 import sys
 import psutil
-import random
 
 caminho_raiz = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-caminho_info = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "info"))
 
 if caminho_raiz not in sys.path:
     sys.path.insert(0, caminho_raiz)
-
-if caminho_info not in sys.path:
-    sys.path.insert(0, caminho_info)
 
 import src.info.memorias
 import src.info.so

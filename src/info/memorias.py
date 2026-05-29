@@ -2,7 +2,7 @@ import platform
 import psutil
 import subprocess
 import os
-from utilidades import *
+from src.info.utilidades import *
 
 def dados_memoria():
     memoria = psutil.virtual_memory()

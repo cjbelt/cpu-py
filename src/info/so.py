@@ -4,7 +4,7 @@ import subprocess
 import json
 import math
 import psutil
-from utilidades import formatar_comando
+from src.info.utilidades import formatar_comando
 
 def dados_so():
     dados = {
