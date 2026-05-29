@@ -4,6 +4,7 @@ import subprocess
 import os
 import json
 import wmi
+import pythoncom
 from src.info.utilidades import *
 
 def dados_memoria():
@@ -82,17 +83,24 @@ def dados_placa_mae():
     sistema = platform.system()
 
     if sistema == "Windows":
+        pythoncom.CoInitialize()
+
         try:
             conexao = wmi.WMI()
-            placa = conexao.Win32_BaseBoard()
-            modelo = placa.Product
-            fabricante = placa.Manufacturer
+            placas = conexao.Win32_BaseBoard()
+
+            for placa in placas:
+                modelo = getattr(placa, "Product", "Desconhecido")
+                fabricante = getattr(placa, "Manufacturer", "Desconhecido")
+                break
             return {
                 "fabricante": fabricante,
                 "modelo": modelo
             }
         except Exception:
             return {"fabricante": "Desconhecido", "modelo": "Desconhecido"}
+        finally:
+            pythoncom.CoUninitialize()
 
     elif sistema == "Linux":
         try:

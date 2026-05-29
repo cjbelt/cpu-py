@@ -4,6 +4,7 @@ import platform
 import os
 import wmi
 import subprocess
+import pythoncom
 from src.info.utilidades import *
 
 def dados_cpu():
@@ -23,14 +24,16 @@ def dados_cache():
     caches = {}
 
     if sistema == "Windows":
+        pythoncom.CoInitialize()
+
         try:
             conexao = wmi.WMI()
             caches_wmi = conexao.Win32_CacheMemory()
 
             for cache in caches_wmi:
                 try:
-                    nivel = cache.Level
-                    tamanho = cache.InstalledSize
+                    nivel = getattr(cache, "Level", 0)
+                    tamanho = getattr(cache, "InstalledSize", 0)
 
                     if nivel == "3":
                         caches["L1"] += tamanho
@@ -42,6 +45,8 @@ def dados_cache():
                     continue
         except Exception:
             pass
+        finally:
+            pythoncom.CoUninitialize()
 
     elif sistema == "Linux" and os.path.exists("/sys/devices/system/cpu/cpu0/cache/"):
         try:

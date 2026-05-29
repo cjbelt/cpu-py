@@ -2,6 +2,7 @@ import platform
 import subprocess
 import os
 import wmi
+import pythoncom
 import src.info.amd_wrapper
 from src.info.utilidades import *
 
@@ -10,11 +11,8 @@ def dados_gpu():
     gpus = {}
 
     if sistema == "Windows":
+        pythoncom.CoInitialize()
         try:
-            comando = ["powershell", "-NoProfile", "-Command", "Get-CimInstance Win32_VideoController | ForEach-Object { [string]$_.Name + ';' + [string]$_.AdapterRAM + ';' + [string]$_.PNPDeviceID }"]
-            saida = subprocess.run(comando, text=True, timeout=5, capture_output=True).stdout
-            linhas = formatar_comando(saida)
-
             conexao = wmi.WMI()
             placas = conexao.Win32_VideoController()
 
@@ -43,6 +41,8 @@ def dados_gpu():
 
         except Exception:
             pass
+        finally:
+            pythoncom.CoUninitialize()
 
     elif sistema == "Linux":
         caminho_drm = "/sys/class/drm/"

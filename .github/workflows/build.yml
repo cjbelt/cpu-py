@@ -26,7 +26,7 @@ jobs:
 
     - name: Compilar com PyInstaller
       run: |
-        pyinstaller --noconsole --onefile --collect-all customtkinter main.py
+        pyinstaller --noconsole --onefile --hidden-import=pywintypes --collect-all customtkinter main.py
 
     - name: Disponibilizar o Executável para Download
       uses: actions/upload-artifact@v4
