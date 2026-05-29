@@ -8,10 +8,13 @@ def executar_primeiro_valido(comandos):
 
     for comando in comandos:
         try:
-            resultado = subprocess.check_output(
+            resultado = subprocess.run(
                 comando,
                 text=True,
-                stderr=subprocess.DEVNULL
+                stderr=subprocess.DEVNULL,
+                timeout=5,
+                creationflags=subprocess.CREATE_NO_WINDOW,
+                capture_output=True
             )
             return resultado
         except Exception:

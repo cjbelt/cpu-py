@@ -175,6 +175,7 @@ class MonitorApp(ctk.CTk):
         lbl_cabecalho.pack(side="left", padx=30, pady=15)
 
         card_ram = self.criar_card_informativo(tela, "#37474F", "Memória RAM")
+        self.inserir_linha_informacao(card_ram, "Tecnologia: ", self.ram["tecnologia"])
 
         linha_uso = ctk.CTkFrame(card_ram, fg_color="transparent")
         linha_uso.pack(fill="x", padx=20, pady=10)
@@ -276,7 +277,7 @@ class MonitorApp(ctk.CTk):
 
         self.cpu = src.info.cpu.dados_cpu()
         self.ram = src.info.memorias.dados_memoria()
-        src.info.memorias.dados_ddr(self.ram)
+        self.ram["tecnologia"] = src.info.memorias.dados_ddr()
         self.discos = src.info.memorias.dados_discos()
         self.caches = src.info.cpu.dados_cache()
         self.sistem_op = src.info.so.dados_so()

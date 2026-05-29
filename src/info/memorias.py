@@ -27,32 +27,29 @@ def mapear_ddr(codigo):
 
     return codigos.get(codigo, "N/A")
 
-def dados_ddr(dict_dados):
+def dados_ddr():
     sistema = platform.system()
 
     if sistema == 'Windows':
         comando = ["powershell", "-NoProfile", "-Command", "Get-CimInstance Win32_PhysicalMemory | Select-Object -ExpandProperty SMBIOSMemoryType"]
-        saida = subprocess.check_output(comando, text=True)
+        saida = subprocess.run(comando, text=True, capture_output=True, timeout=5, creationflags=subprocess.CREATE_NO_WINDOW).stdout
         linhas = formatar_comando(saida)
 
         if linhas:
-            dict_dados["tecnologia"] = mapear_ddr(linhas[0])
-            return
+            return mapear_ddr(linhas[0])
 
     elif sistema == 'Linux':
-        try:
-            comando = "pkexec dmidecode --type memory | grep 'Type: DDR'"
-            saida = subprocess.check_output(comando, text=True)
-            linhas = formatar_comando(saida)
+        # try:
+        comando = ["pkexec", "dmidecode", "--type", "memory"]
+        saida = subprocess.run(comando, text=True, capture_output=True).stdout
+        linhas = formatar_comando(saida)
 
-            for linha in linhas:
-                if "Type:" in linha:
-                    dict_dados["tecnologia"] = linha.split("Type:")[1].strip()
-                    return
-        except Exception:
-            pass
+        for linha in linhas:
+            if "Type:" in linha and "DDR" in linha:
+                return linha.split("Type:")[1].strip()
+        # except Exception:
+            # pass
 
-    dict_dados["tecnologia"] = "Desconhecido"
     return "Desconhecido"
 
 def dados_discos():
@@ -83,12 +80,15 @@ def dados_placa_mae():
     sistema = platform.system()
 
     if sistema == "Windows":
-        comando = ["powershell", "-NoProfile", "-Command", "Get-CimInstance Win32_BaseBoard | Select_Object -ExpandProperty Manufacturer, Product"]
-        saida = subprocess.check_output(comando, text=True)
-        linhas = formatar_comando(saida)
+        try:
+            comando = ["powershell", "-NoProfile", "-Command", "Get-CimInstance Win32_BaseBoard | Select_Object -ExpandProperty Manufacturer, Product"]
+            saida = subprocess.run(comando, text=True, capture_output=True, timeout=5, creationflags=subprocess.CREATE_NO_WINDOW).stdout
+            linhas = formatar_comando(saida)
 
-        if len(linhas) >= 2:
-            return {"fabricante": linhas[0], "modelo": linhas[1]}
+            if len(linhas) >= 2:
+                return {"fabricante": linhas[0], "modelo": linhas[1]}
+        except Exception:
+            return {"fabricante": "Desconhecido", "modelo": "Desconhecido"}
 
     elif sistema == "Linux":
         try:

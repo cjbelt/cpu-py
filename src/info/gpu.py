@@ -11,7 +11,7 @@ def dados_gpu():
     if sistema == "Windows":
         try:
             comando = ["powershell", "-NoProfile", "-Command", "Get-CimInstance Win32_VideoController | ForEach-Object { \"$($_.Name);$($_.AdapterRAM);$($_PNPDeviceID)\" }"]
-            saida = subprocess.check_output(comando, text=True)
+            saida = subprocess.run(comando, text=True, timeout=5, capture_output=True).stdout
             linhas = formatar_comando(saida)
 
             for idx, linha in enumerate(linhas):
@@ -52,7 +52,7 @@ def dados_gpu():
 
                 try:
                     endereco_pci = os.path.basename(os.path.realpath(caminho_placa))
-                    saida_lspci = subprocess.check_output(["lspci", "-s", endereco_pci], stderr=subprocess.DEVNULL).strip()
+                    saida_lspci = subprocess.run(["lspci", "-s", endereco_pci], text=True, capture_output=True).stdout.strip()
                     nome = saida_lspci.split("controller:")[1].strip()
                 except Exception:
                     nome = "Placa de vídeo"
@@ -84,7 +84,7 @@ def dados_gpu():
 def telemetria_nvidia(id_slot=0):
     try:
         comando = ["nvidia-smi", "-i", str(id_slot), "--query-gpu=temperature.gpu,utilization.gpu", "--format=csv,noheader,nounits"]
-        saida = subprocess.check_output(comando, text=True, stderr=subprocess.DEVNULL).strip()
+        saida = subprocess.run(comando, text=True, capture_output=True).stdout.strip()
         temperatura, uso = saida.split(",")
         return {
             "temperatura": int(temperatura.strip()),

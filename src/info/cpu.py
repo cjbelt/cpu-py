@@ -20,25 +20,28 @@ def dados_cache():
     caches = {}
 
     if sistema == "Windows":
-        comando = ["powershell",  "-NoProfile -Command", 'Get-CimInstance Win32_CacheMemory | ForEach-Object { "$($_.Level),$($_.InstalledSize)" }']
-        saida = subprocess.check_output(comando, text=True)
+        try:
+            comando = ["powershell",  "-NoProfile", "-Command", 'Get-CimInstance Win32_CacheMemory | ForEach-Object { "$($_.Level),$($_.InstalledSize)" }']
+            saida = subprocess.run(comando, text=True, timeout=5, capture_output=True).stdout
 
-        if saida:
-            linhas = formatar_comando(saida)
+            if saida:
+                linhas = formatar_comando(saida)
 
-            for linha in linhas:
-                try:
-                    nivel, tamanho_kb = linha.split(',')
-                    tamanho_kb = int(tamanho_kb)
+                for linha in linhas:
+                    try:
+                        nivel, tamanho_kb = linha.split(',')
+                        tamanho_kb = int(tamanho_kb)
 
-                    if nivel == "3":
-                        caches["L1"] += tamanho_kb
-                    elif nivel == "4":
-                        caches["L2"] += tamanho_kb
-                    elif nivel == "5":
-                        caches["L3"] += tamanho_kb
-                except (ValueError, IndexError):
-                    continue
+                        if nivel == "3":
+                            caches["L1"] += tamanho_kb
+                        elif nivel == "4":
+                            caches["L2"] += tamanho_kb
+                        elif nivel == "5":
+                            caches["L3"] += tamanho_kb
+                    except (ValueError, IndexError):
+                        continue
+        except Exception:
+            pass
 
     elif sistema == "Linux" and os.path.exists("/sys/devices/system/cpu/cpu0/cache/"):
         try:

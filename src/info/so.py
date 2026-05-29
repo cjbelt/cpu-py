@@ -54,7 +54,7 @@ def dados_monitores():
 
         try:
             comando = ["powershell", "-NoProfile", "-Command", script]
-            saida = subprocess.check_output(comando, text=True, stderr=subprocess.DEVNULL).strip()
+            saida = subprocess.run(comando, text=True, capture_output=True, timeout=5, creationflags=subprocess.CREATE_NO_WINDOW).stdout.strip()
 
             if saida:
                 dados = json.loads(saida)
@@ -86,7 +86,7 @@ def dados_monitores():
 
     elif sistema == "Linux":
         try:
-            saida = subprocess.check_output("xrandr", text=True, stderr=subprocess.DEVNULL)
+            saida = subprocess.run("xrandr", text=True, capture_output=True).stdout
             linhas = formatar_comando(saida)
 
             for linha in linhas:
