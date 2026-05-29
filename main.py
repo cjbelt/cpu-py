@@ -2,7 +2,7 @@ import os
 import sys
 
 diretorio_raiz = os.path.abspath(os.path.dirname(__file__))
-diretorio_info = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "info"))
+diretorio_info = os.path.abspath(os.path.join(os.path.dirname(__file__), "src", "info"))
 
 if diretorio_raiz not in sys.path:
     sys.path.insert(0, diretorio_raiz)
