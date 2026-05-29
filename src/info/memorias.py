@@ -39,16 +39,16 @@ def dados_ddr():
             return mapear_ddr(linhas[0])
 
     elif sistema == 'Linux':
-        # try:
-        comando = ["pkexec", "dmidecode", "--type", "memory"]
-        saida = subprocess.run(comando, text=True, capture_output=True).stdout
-        linhas = formatar_comando(saida)
+        try:
+            comando = ["pkexec", "dmidecode", "--type", "memory"]
+            saida = subprocess.run(comando, text=True, capture_output=True).stdout
+            linhas = formatar_comando(saida)
 
-        for linha in linhas:
-            if "Type:" in linha and "DDR" in linha:
-                return linha.split("Type:")[1].strip()
-        # except Exception:
-            # pass
+            for linha in linhas:
+                if "Type:" in linha and "DDR" in linha:
+                    return linha.split("Type:")[1].strip()
+        except Exception:
+            pass
 
     return "Desconhecido"
 

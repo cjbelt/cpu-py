@@ -84,7 +84,7 @@ def dados_gpu():
 def telemetria_nvidia(id_slot=0):
     try:
         comando = ["nvidia-smi", "-i", str(id_slot), "--query-gpu=temperature.gpu,utilization.gpu", "--format=csv,noheader,nounits"]
-        saida = subprocess.run(comando, text=True, capture_output=True).stdout.strip()
+        saida = subprocess.run(comando, text=True, capture_output=True, timeout=10).stdout.strip()
         temperatura, uso = saida.split(",")
         return {
             "temperatura": int(temperatura.strip()),
