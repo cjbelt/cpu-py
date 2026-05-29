@@ -7,7 +7,11 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build-windows:
+  build:
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+
     runs-on: windows-latest
 
     steps:
@@ -18,18 +22,35 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: '3.11.2'
+        cache: 'pip'
+
+    - name: Instalar Dependências de Interface do Linux
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y python3-tk
 
     - name: Instalar Dependências do Projeto
       run: |
         python -move pip install --upgrade pip
-        pip install customtkinter psutil py_cpuinfo wmi pyinstaller
+        pip install customtkinter psutil py_cpuinfo pyinstaller
 
-    - name: Compilar com PyInstaller
+    - name: Instalar WMI para Windows
+      if: matrix.os == 'windows-latest'
+      run: pip install wmi
+
+    - name: Compilar para Windows com PyInstaller
+      if: matrix.os == 'windows-latest'
       run: |
         pyinstaller --noconsole --onefile --hidden-import=pywintypes --collect-all customtkinter main.py
 
-    - name: Disponibilizar o Executável para Download
+    - name: Compilar para Linux com PyInstaller
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        pyinstaller --noconsole --onefile --collect-all customtkinter main.py
+
+    - name: Disponibilizar os Executáveis para Download
       uses: actions/upload-artifact@v4
       with:
-        name: cpu-py-windows
-        path: dist/main.exe
+        name: cpu-py-${{ matrix.os }}
+        path: dist/

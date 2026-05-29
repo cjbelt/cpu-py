@@ -1,8 +1,11 @@
 import platform
 import subprocess
 import os
-import wmi
-import pythoncom
+
+if platform.system() == "Windows":
+    import wmi
+    import pythoncom
+
 import src.info.amd_wrapper
 from src.info.utilidades import *
 

@@ -97,17 +97,18 @@ class MonitorApp(ctk.CTk):
         cabecalho = ctk.CTkFrame(tela, fg_color="#1F6AA5", height=60, corner_radius=0)
         cabecalho.pack(fill="x", side="top")
         cabecalho.pack_propagate(False)
-        lbl_cabecalho = ctk.CTkLabel(cabecalho, text="Processador", font=ctk.CTkFont(size=20, weight="bold"), text_color="white")
+        lbl_cabecalho = ctk.CTkLabel(cabecalho, text="Processador", font=ctk.CTkFont(size=24, weight="bold"), text_color="white")
         lbl_cabecalho.pack(side="left", padx=30, pady=15)
 
-        card_processador = self.criar_card_informativo(tela, "#1F6AA5", "Informações do Processador")
+        card_processador = self.criar_card_informativo(tela, "#1F6AA5", "Informações do Processador", val_pady=10)
 
         self.inserir_linha_informacao(card_processador, "Nome: ", self.cpu["nome"])
+        self.inserir_linha_informacao(card_processador, "Frequência: ", f"{round(self.cpu['frequencia'], 2)} GHz")
         self.inserir_linha_informacao(card_processador, "Arquitetura: ", self.cpu["arquitetura"])
         self.inserir_linha_informacao(card_processador, "Núcleos Físicos: ", self.cpu["nucleos_fisicos"])
         self.inserir_linha_informacao(card_processador, "Threads: ", self.cpu["nucleos_logicos"])
 
-        card_cache = self.criar_card_informativo(tela, "#1F6AA5", "Cache Físico")
+        card_cache = self.criar_card_informativo(tela, "#1F6AA5", "Cache Físico", val_pady=10)
 
         lista_niveis_cache = list(self.caches.keys())
         lista_niveis_cache.sort()
@@ -123,7 +124,7 @@ class MonitorApp(ctk.CTk):
         cabecalho = ctk.CTkFrame(tela, fg_color="#2E7D32", height=60, corner_radius=0)
         cabecalho.pack(fill="x", side="top")
         cabecalho.pack_propagate(False)
-        lbl_cabecalho = ctk.CTkLabel(cabecalho, text="Placa de Vídeo", font=ctk.CTkFont(size=20, weight="bold"), text_color="white")
+        lbl_cabecalho = ctk.CTkLabel(cabecalho, text="Placa de Vídeo", font=ctk.CTkFont(size=24, weight="bold"), text_color="white")
         lbl_cabecalho.pack(side="left", padx=30, pady=15)
 
         card_gpu = ctk.CTkFrame(tela, fg_color="#212121", border_width=1, border_color="#333333")
@@ -249,7 +250,7 @@ class MonitorApp(ctk.CTk):
             linha_uso = ctk.CTkFrame(card_disco, fg_color="transparent")
             linha_uso.pack(fill="x", padx=20, pady=5)
             ctk.CTkLabel(linha_uso, text="Uso: ", font=ctk.CTkFont(size=16, weight="bold")).pack(anchor="w", padx=10, pady=15)
-            barra_part_uso = ctk.CTkProgressBar(linha_uso, width=600, height=15, progress_color="#00838F", corner_radius=0)
+            barra_part_uso = ctk.CTkProgressBar(linha_uso, width=550, height=15, progress_color="#00838F", corner_radius=0)
             particao["barra"] = barra_part_uso
             barra_part_uso.pack(side="left", padx=(0, 20))
             barra_part_uso.set(particao["usado"] / particao["total"])
@@ -307,6 +308,11 @@ class MonitorApp(ctk.CTk):
                 self.lbl_gpu_num.configure(text=f"{uso_gpu}%")
                 self.barra_gpu_uso.set(uso_gpu / 100)
                 self.lbl_gpu_temp.configure(text=f"Temperatura da GPU: {temp_gpu}°C")
+
+            elif self.aba_atual == "so":
+                self.bateria = src.info.so.dados_bateria()
+                self.nivel_bateria.configure(text=f"{self.bateria['porcentagem']}%")
+                self.carregando.configure(text="Sim" if self.bateria["carregando"] else "Não")
 
         except Exception:
             pass

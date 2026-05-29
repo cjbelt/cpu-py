@@ -3,8 +3,10 @@ import psutil
 import subprocess
 import os
 import json
-import wmi
-import pythoncom
+if platform.system() == "Windows":
+    import wmi
+    import pythoncom
+
 from src.info.utilidades import *
 
 def dados_memoria():
