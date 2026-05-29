@@ -307,10 +307,6 @@ class MonitorApp(ctk.CTk):
                 self.barra_gpu_uso.set(uso_gpu / 100)
                 self.lbl_gpu_temp.configure(text=f"Temperatura da GPU: {temp_gpu}°C")
 
-            # elif self.aba_atual == "disco":
-            #     atividade_disco = random.randint(0, 100)
-            #     self.bar_disco_uso.set(atividade_disco / 100)
-            #     self.lbl_disco_num.configure(text=f"{atividade_disco}%")
         except Exception:
             pass
 

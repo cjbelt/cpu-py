@@ -11,7 +11,7 @@ def dados_gpu():
     if sistema == "Windows":
         try:
             comando = ["powershell", "-NoProfile", "-Command", "Get-CimInstance Win32_VideoController | ForEach-Object { \"$($_.Name);$($_.AdapterRAM);$($_PNPDeviceID)\" }"]
-            saida = subprocess.check_output(comando, shell=True, text=True)
+            saida = subprocess.check_output(comando, text=True)
             linhas = formatar_comando(saida)
 
             for idx, linha in enumerate(linhas):
@@ -52,7 +52,7 @@ def dados_gpu():
 
                 try:
                     endereco_pci = os.path.basename(os.path.realpath(caminho_placa))
-                    saida_lspci = subprocess.check_output(["lspci", "-s", endereco_pci], text=True, stderr=subprocess.DEVNULL).strip()
+                    saida_lspci = subprocess.check_output(["lspci", "-s", endereco_pci], stderr=subprocess.DEVNULL).strip()
                     nome = saida_lspci.split("controller:")[1].strip()
                 except Exception:
                     nome = "Placa de vídeo"
@@ -71,12 +71,6 @@ def dados_gpu():
                     fabricante = "AMD"
                 else:
                     fabricante = "Intel"
-
-                # if dedicada:
-                #     if fabricante == "NVIDIA":
-                #         telemetria = telemetria_nvidia()
-                #     elif fabricante == "AMD":
-                #         telemetria = telemetria_amd_linux(slot)
 
                 gpus[slot] = {
                     "id": idx,

@@ -21,7 +21,7 @@ def dados_cache():
 
     if sistema == "Windows":
         comando = ["powershell",  "-NoProfile -Command", 'Get-CimInstance Win32_CacheMemory | ForEach-Object { "$($_.Level),$($_.InstalledSize)" }']
-        saida = subprocess.check_output(comando, shell=True, text=True)
+        saida = subprocess.check_output(comando, text=True)
 
         if saida:
             linhas = formatar_comando(saida)

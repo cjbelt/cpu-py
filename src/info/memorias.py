@@ -32,7 +32,7 @@ def dados_ddr(dict_dados):
 
     if sistema == 'Windows':
         comando = ["powershell", "-NoProfile", "-Command", "Get-CimInstance Win32_PhysicalMemory | Select-Object -ExpandProperty SMBIOSMemoryType"]
-        saida = subprocess.check_output(comando, shell=True, text=True)
+        saida = subprocess.check_output(comando, text=True)
         linhas = formatar_comando(saida)
 
         if linhas:
@@ -42,7 +42,7 @@ def dados_ddr(dict_dados):
     elif sistema == 'Linux':
         try:
             comando = "pkexec dmidecode --type memory | grep 'Type: DDR'"
-            saida = subprocess.check_output(comando, shell=True, text=True)
+            saida = subprocess.check_output(comando, text=True)
             linhas = formatar_comando(saida)
 
             for linha in linhas:
@@ -84,7 +84,7 @@ def dados_placa_mae():
 
     if sistema == "Windows":
         comando = ["powershell", "-NoProfile", "-Command", "Get-CimInstance Win32_BaseBoard | Select_Object -ExpandProperty Manufacturer, Product"]
-        saida = subprocess.check_output(comando, text=True, shell=True)
+        saida = subprocess.check_output(comando, text=True)
         linhas = formatar_comando(saida)
 
         if len(linhas) >= 2:

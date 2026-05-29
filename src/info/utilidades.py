@@ -8,12 +8,9 @@ def executar_primeiro_valido(comandos):
 
     for comando in comandos:
         try:
-            usar_shell = isinstance(comando, str)
-
             resultado = subprocess.check_output(
                 comando,
                 text=True,
-                shell=usar_shell,
                 stderr=subprocess.DEVNULL
             )
             return resultado
