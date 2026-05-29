@@ -1,6 +1,7 @@
 import platform
 import subprocess
 import os
+import wmi
 import src.info.amd_wrapper
 from src.info.utilidades import *
 
@@ -14,9 +15,14 @@ def dados_gpu():
             saida = subprocess.run(comando, text=True, timeout=5, capture_output=True).stdout
             linhas = formatar_comando(saida)
 
-            for idx, linha in enumerate(linhas):
+            conexao = wmi.WMI()
+            placas = conexao.Win32_VideoController()
+
+            for idx, placa in enumerate(placas):
                 slot = f"gpu{idx}"
-                nome, vram, pnp_id = linha.split(";")
+                nome = placa.Name
+                vram = placa.AdapterRAM
+                pnp_id = placa.PNPDeviceID
 
                 try:
                     vram_gb = bytes_para_gb(vram)

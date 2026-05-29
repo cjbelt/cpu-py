@@ -2,6 +2,8 @@ import psutil
 import cpuinfo
 import platform
 import os
+import wmi
+import subprocess
 from src.info.utilidades import *
 
 def dados_cpu():
@@ -22,25 +24,22 @@ def dados_cache():
 
     if sistema == "Windows":
         try:
-            comando = ["powershell",  "-NoProfile", "-Command", "Get-CimInstance Win32_CacheMemory | ForEach-Object { [string]$_.Level + ',' + [string]$_.InstalledSize }"]
-            saida = subprocess.run(comando, text=True, timeout=5, capture_output=True).stdout
+            conexao = wmi.WMI()
+            caches_wmi = conexao.Win32_CacheMemory()
 
-            if saida:
-                linhas = formatar_comando(saida)
+            for cache in caches_wmi:
+                try:
+                    nivel = cache.Level
+                    tamanho = cache.InstalledSize
 
-                for linha in linhas:
-                    try:
-                        nivel, tamanho_kb = linha.split(',')
-                        tamanho_kb = int(tamanho_kb)
-
-                        if nivel == "3":
-                            caches["L1"] += tamanho_kb
-                        elif nivel == "4":
-                            caches["L2"] += tamanho_kb
-                        elif nivel == "5":
-                            caches["L3"] += tamanho_kb
-                    except (ValueError, IndexError):
-                        continue
+                    if nivel == "3":
+                        caches["L1"] += tamanho
+                    elif nivel == "4":
+                        caches["L2"] += tamanho
+                    elif nivel == "5":
+                        caches["L3"] += tamanho
+                except (ValueError, IndexError):
+                    continue
         except Exception:
             pass
 

@@ -3,6 +3,7 @@ import psutil
 import subprocess
 import os
 import json
+import wmi
 from src.info.utilidades import *
 
 def dados_memoria():
@@ -82,12 +83,10 @@ def dados_placa_mae():
 
     if sistema == "Windows":
         try:
-            comando = ["powershell", "-NoProfile", "-Command", "Get-CimInstance Win32_BaseBoard | Select-Object Manufacturer, Product | ConvertTo-Json"]
-            saida = subprocess.run(comando, text=True, capture_output=True, timeout=5, creationflags=subprocess.CREATE_NO_WINDOW).stdout
-            dados = json.loads(saida)
-
-            fabricante = dados.get("Manufacturer")
-            modelo = dados.get("Product")
+            conexao = wmi.WMI()
+            placa = conexao.Win32_BaseBoard()
+            modelo = placa.Product
+            fabricante = placa.Manufacturer
             return {
                 "fabricante": fabricante,
                 "modelo": modelo
