@@ -22,7 +22,7 @@ def dados_cache():
 
     if sistema == "Windows":
         try:
-            comando = ["powershell",  "-NoProfile", "-Command", 'Get-CimInstance Win32_CacheMemory | ForEach-Object { \"$($_.Level),$($_.InstalledSize)\" }']
+            comando = ["powershell",  "-NoProfile", "-Command", "Get-CimInstance Win32_CacheMemory | ForEach-Object { [string]$_.Level + ',' + [string]$_.InstalledSize }"]
             saida = subprocess.run(comando, text=True, timeout=5, capture_output=True).stdout
 
             if saida:
