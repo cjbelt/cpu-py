@@ -48,7 +48,7 @@ jobs:
     - name: Compilar para Linux com PyInstaller
       if: matrix.os == 'ubuntu-latest'
       run: |
-        pyinstaller --windowed --onedir --name "cpu-py-linux" --add-data "${ctk_path};customtkinter/" --add-data "src/Corinthians vinheta da Radio! Corinthians.mp3;src/" main.py
+        pyinstaller --windowed --onedir --name "cpu-py-linux" --add-data "${ctk_path}:customtkinter/" --add-data "src/Corinthians vinheta da Radio! Corinthians.mp3:src/" main.py
 
     - name: Disponibilizar os Executáveis para Download
       uses: actions/upload-artifact@v4
