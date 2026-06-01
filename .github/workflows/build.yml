@@ -23,16 +23,16 @@ jobs:
       with:
         python-version: '3.11.2'
 
-    - name: Instalar Dependências de Interface do Linux
+    - name: Instalar Dependências de Interface e som do Linux
       if: matrix.os == 'ubuntu-latest'
       run: |
         sudo apt-get update
-        sudo apt-get install -y python3-tk
+        sudo apt-get install -y python3-tk libportaudio2
 
     - name: Instalar Dependências do Projeto
       run: |
         python -move pip install --upgrade pip
-        pip install customtkinter psutil py_cpuinfo pyinstaller
+        pip install customtkinter psutil py_cpuinfo pyinstaller sounddevice miniaudio numpy
 
     - name: Instalar WMI para Windows
       if: matrix.os == 'windows-latest'
@@ -41,12 +41,13 @@ jobs:
     - name: Compilar para Windows com PyInstaller
       if: matrix.os == 'windows-latest'
       run: |
-        pyinstaller --noconsole --onefile --hidden-import=pywintypes --collect-all customtkinter main.py
+        $ctk_path = python -c "import customtkinter, os; print(os.path.dirname(customtkinter.__file__))"
+        pyinstaller --windowed --onedir --hidden-import=pywintypes --name "cpu-py-windows" --add-data "${ctk_path};customtkinter/" --add-data "src/Corinthians vinheta da Radio! Corinthians.mp3;src/" main.py
 
     - name: Compilar para Linux com PyInstaller
       if: matrix.os == 'ubuntu-latest'
       run: |
-        pyinstaller --noconsole --onefile --collect-all customtkinter main.py
+        pyinstaller --windowed --onedir --name "cpu-py-linux" --add-data "${ctk_path};customtkinter/" --add-data "src/Corinthians vinheta da Radio! Corinthians.mp3;src/" main.py
 
     - name: Disponibilizar os Executáveis para Download
       uses: actions/upload-artifact@v4

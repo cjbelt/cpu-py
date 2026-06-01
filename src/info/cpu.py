@@ -26,7 +26,11 @@ def dados_cpu():
 
 def dados_cache():
     sistema = platform.system()
-    caches = {}
+    caches = {
+        "L1": "Desconhecido",
+        "L2": "Desconhecido",
+        "L3": "Desconhecido"
+    }
 
     if sistema == "Windows":
         pythoncom.CoInitialize()
@@ -41,11 +45,11 @@ def dados_cache():
                     tamanho = getattr(cache, "InstalledSize", 0)
 
                     if nivel == "3":
-                        caches["L1"] = caches.get("L1", 0) + tamanho
+                        caches["L1"] = caches.get("L1", 0) + int(tamanho)
                     elif nivel == "4":
-                        caches["L2"] = caches.get("L2", 0) + tamanho
+                        caches["L2"] = caches.get("L2", 0) + int(tamanho)
                     elif nivel == "5":
-                        caches["L3"] = caches.get("L3", 0) + tamanho
+                        caches["L3"] = caches.get("L3", 0) + int(tamanho)
                 except (ValueError, IndexError):
                     continue
 
@@ -72,5 +76,37 @@ def dados_cache():
 
     return caches
 
+def temperatura_cpu():
+    sistema = platform.system()
+
+    if sistema == "Windows":
+        python.CoInitialize()
+        try:
+            conexao = wmi.WMI(namespace="root\\wmi")
+
+            zonas_termicas = conexao.MSAcpi_ThermalZoneTemperature()
+            temperatura = zonas_termicas[0].CurrentTemperature
+            return f"{round((temperatura / 10.0) - 273.15, 1)}°C"
+        except wmi.x_wmi:
+            return "Requer permissões de administrador"
+        except Exception:
+            return "--°C"
+        finally:
+            pythoncom.CoUninitialize()
+
+    elif sistema == "Linux":
+        try:
+            sensores = psutil.sensors_temperatures()
+            chaves = ["k10temp", "coretemp", "zenpower", "cpu_thermal"]
+
+            for chave in chaves:
+                if chave in sensores:
+                    return f"{round(sensores[chave][0].current, 1)}°C"
+        except Exception:
+            return "--°C"
+
+
+
 if __name__ == '__main__':
-    print(dados_cpu()["frequencia"])
+    # print(dados_cpu()["frequencia"])
+    print(temperatura_cpu())

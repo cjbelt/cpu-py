@@ -8,6 +8,7 @@ if platform.system() == "Windows":
     import pythoncom
 
 from src.info.utilidades import *
+# from utilidades import *
 
 def dados_memoria():
     memoria = psutil.virtual_memory()
@@ -114,7 +115,31 @@ def dados_placa_mae():
 
     return {"fabricante": "Desconhecido", "modelo": "Desconhecido"}
 
+def temperatura_placa_mae():
+    sistema = platform.system()
+
+    if sistema == "Windows":
+        pythoncom.CoInitialize()
+
+        try:
+            conexao = wmi.WMI(namespace="root\\wmi")
+            zonas_termicas = conexao.MSAcpi_ThermalZoneTemperature()
+            return f"{round(zonas_termicas[1].CurrentTemperature / 10.0 - 273.15,1)}°C"
+        except Exception:
+            return "--°C"
+        finally:
+            pythoncom.CoUninitialize()
+
+    elif sistema == "Linux":
+        sensores = psutil.sensors_temperatures()
+
+        try:
+            return f"{sensores['acpitz'][0].current}°C"
+        except Exception:
+            return "--°C"
+
 if __name__ == '__main__':
     # print(dados_cache())
     # print(dados_ddr())
     print(dados_discos())
+    print(temperatura_placa_mae())

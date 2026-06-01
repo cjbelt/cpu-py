@@ -99,8 +99,9 @@ class MonitorApp(ctk.CTk):
         cabecalho.pack_propagate(False)
         lbl_cabecalho = ctk.CTkLabel(cabecalho, text="Processador", font=ctk.CTkFont(size=24, weight="bold"), text_color="white")
         lbl_cabecalho.pack(side="left", padx=30, pady=15)
-
-        card_processador = self.criar_card_informativo(tela, "#1F6AA5", "Informações do Processador", val_pady=10)
+        frame_conteudo = ctk.CTkScrollableFrame(tela, fg_color="transparent", orientation="vertical")
+        frame_conteudo.pack(fill="both", expand=True, padx=20, pady=10)
+        card_processador = self.criar_card_informativo(frame_conteudo, "#1F6AA5", "Informações do Processador", val_pady=10)
 
         self.inserir_linha_informacao(card_processador, "Nome: ", self.cpu["nome"])
         self.inserir_linha_informacao(card_processador, "Frequência: ", f"{round(self.cpu['frequencia'], 2)} GHz")
@@ -108,7 +109,14 @@ class MonitorApp(ctk.CTk):
         self.inserir_linha_informacao(card_processador, "Núcleos Físicos: ", self.cpu["nucleos_fisicos"])
         self.inserir_linha_informacao(card_processador, "Threads: ", self.cpu["nucleos_logicos"])
 
-        card_cache = self.criar_card_informativo(tela, "#1F6AA5", "Cache Físico", val_pady=10)
+        self.card_temp_cpu = ctk.CTkFrame(card_processador, fg_color="#1A1A1A", width=250, height=80)
+        self.card_temp_cpu.pack(anchor="w", padx=300, pady=20)
+        self.card_temp_cpu.pack_propagate(False)
+
+        self.lbl_cpu_temp = ctk.CTkLabel(self.card_temp_cpu, text="Temperatura: --°C", font=ctk.CTkFont(size=18, weight="bold"), text_color="#E53935")
+        self.lbl_cpu_temp.pack(expand=True)
+
+        card_cache = self.criar_card_informativo(frame_conteudo, "#1F6AA5", "Cache Físico", val_pady=10)
 
         lista_niveis_cache = list(self.caches.keys())
         lista_niveis_cache.sort()
@@ -161,7 +169,7 @@ class MonitorApp(ctk.CTk):
         self.card_temp.pack(anchor="w", padx=300, pady=20)
         self.card_temp.pack_propagate(False)
 
-        self.lbl_gpu_temp = ctk.CTkLabel(self.card_temp, text="Temp: --°C", font=ctk.CTkFont(size=18, weight="bold"), text_color="#E53935")
+        self.lbl_gpu_temp = ctk.CTkLabel(self.card_temp, text="Temperatura: --°C", font=ctk.CTkFont(size=18, weight="bold"), text_color="#E53935")
         self.lbl_gpu_temp.pack(expand=True)
 
         self.telas["gpu"] = tela
@@ -192,6 +200,12 @@ class MonitorApp(ctk.CTk):
 
         self.inserir_linha_informacao(card_placa_mae, "Fabricante: ", self.placa_mae["fabricante"])
         self.inserir_linha_informacao(card_placa_mae, "Modelo: ", self.placa_mae["modelo"])
+        self.card_temp_placa = ctk.CTkFrame(card_placa_mae, fg_color="#1A1A1A", width=250, height=80)
+        self.card_temp_placa.pack(anchor="w", padx=300, pady=20)
+        self.card_temp_placa.pack_propagate(False)
+
+        self.lbl_placa_temp = ctk.CTkLabel(self.card_temp_placa, text="Temperatura: --°C", font=ctk.CTkFont(size=18, weight="bold"), text_color="#E53935")
+        self.lbl_placa_temp.pack(expand=True)
 
         self.telas["ram"] = tela
 
@@ -230,6 +244,11 @@ class MonitorApp(ctk.CTk):
             card_bateria = self.criar_card_informativo(frame_conteudo, "#E65100", "Bateria")
             self.nivel_bateria = self.inserir_linha_informacao(card_bateria, "Carga: ", f"{self.bateria['porcentagem']}%")
             self.carregando = self.inserir_linha_informacao(card_bateria, "Carregando: ", "Sim" if self.bateria["carregando"] else "Não")
+
+        card_som = self.criar_card_informativo(frame_conteudo, "#E65100", "Som")
+        ctk.CTkButton(card_som, text="Testar Som", font=ctk.CTkFont(size=18, weight="bold"),
+        fg_color="#E65100", hover_color="#B33900", width=200, height=50, corner_radius=0,
+        command=lambda: src.info.so.reproduzir_som()).pack(side="left", padx=300, pady=10)
 
         self.telas["so"] = tela
 
@@ -289,10 +308,16 @@ class MonitorApp(ctk.CTk):
 
     def atualizar_telemetria(self):
         try:
-            if self.aba_atual == "ram":
+            if self.aba_atual == "cpu":
+                self.cpu["temperatura"] = src.info.cpu.temperatura_cpu()
+                self.lbl_cpu_temp.configure(text=f"Temperatura: {self.cpu['temperatura']}")
+
+            elif self.aba_atual == "ram":
                 self.ram = src.info.memorias.dados_memoria()
                 self.barra_ram_uso.set(float(self.ram["percentual_uso"]) / 100)
                 self.lbl_ram_uso.configure(text=f"{self.ram['em_uso']}GB / {self.ram['total']}GB")
+                self.placa_mae["temperatura"] = src.info.memorias.temperatura_placa_mae()
+                self.lbl_placa_temp.configure(text=f"Temperatura: {self.placa_mae['temperatura']}")
 
             elif self.aba_atual == "gpu":
                 if self.gpus[self.gpu_slot_selecionado]["fabricante"] == "NVIDIA":
