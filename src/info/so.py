@@ -81,7 +81,7 @@ def dados_monitores():
                     "WidthCm": comprimento_cm,
                     "HeightCm": altura_cm,
                     "Primary": primario,
-                    "Heightpx": altura_px,
+                    "HeightPx": altura_px,
                     "WidthPx": comp_px
                 })
 

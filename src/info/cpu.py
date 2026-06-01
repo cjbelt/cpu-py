@@ -44,11 +44,11 @@ def dados_cache():
                     nivel = getattr(cache, "Level", 0)
                     tamanho = getattr(cache, "InstalledSize", 0)
 
-                    if nivel == "3":
+                    if nivel == 3:
                         caches["L1"] = caches.get("L1", 0) + int(tamanho)
-                    elif nivel == "4":
+                    elif nivel == 4:
                         caches["L2"] = caches.get("L2", 0) + int(tamanho)
-                    elif nivel == "5":
+                    elif nivel == 5:
                         caches["L3"] = caches.get("L3", 0) + int(tamanho)
                 except (ValueError, IndexError):
                     continue
@@ -80,12 +80,14 @@ def temperatura_cpu():
     sistema = platform.system()
 
     if sistema == "Windows":
-        python.CoInitialize()
+        pythoncom.CoInitialize()
         try:
             conexao = wmi.WMI(namespace="root\\wmi")
 
             zonas_termicas = conexao.MSAcpi_ThermalZoneTemperature()
-            temperatura = zonas_termicas[0].CurrentTemperature
+            if zonas_termicas:
+                temperatura = zonas_termicas[0].CurrentTemperature
+
             return f"{round((temperatura / 10.0) - 273.15, 1)}°C"
         except wmi.x_wmi:
             return "Requer permissões de administrador"
