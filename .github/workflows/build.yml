@@ -48,7 +48,7 @@ jobs:
     - name: Compilar para Linux com PyInstaller
       if: matrix.os == 'ubuntu-latest'
       run: |
-        $ctk_path = python -c "import customtkinter, os; print(os.path.dirname(customtkinter.__file__))"
+        ctk_path = $(python -c "import customtkinter, os; print(os.path.dirname(customtkinter.__file__))")
         pyinstaller --windowed --onedir --name "cpu-py-linux" --add-data="${ctk_path}:customtkinter/" --add-data="src/Corinthians vinheta da Radio! Corinthians.mp3:src/" main.py
 
     - name: Disponibilizar os Executáveis para Download
