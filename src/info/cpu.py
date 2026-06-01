@@ -38,6 +38,11 @@ def dados_cache():
         try:
             conexao = wmi.WMI()
             caches_wmi = conexao.Win32_CacheMemory()
+            soma = {
+                "L1": 0,
+                "L2": 0,
+                "L3": 0
+            }
 
             for cache in caches_wmi:
                 try:
@@ -45,16 +50,18 @@ def dados_cache():
                     tamanho = getattr(cache, "InstalledSize", 0)
 
                     if nivel == 3:
-                        caches["L1"] = caches.get("L1", 0) + int(tamanho)
+                        soma["L1"] += int(tamanho)
                     elif nivel == 4:
-                        caches["L2"] = caches.get("L2", 0) + int(tamanho)
+                        soma["L2"] += int(tamanho)
                     elif nivel == 5:
-                        caches["L3"] = caches.get("L3", 0) + int(tamanho)
+                        soma["L3"] += int(tamanho)
                 except (ValueError, IndexError):
                     continue
 
             for cache in caches:
-                caches[cache] = f"{caches[cache]}K"
+                if soma[cache] > 0:
+                    caches[cache] = f"{soma[cache]}K"
+
 
         except Exception:
             pass
