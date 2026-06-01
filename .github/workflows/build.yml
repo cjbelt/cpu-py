@@ -2,9 +2,13 @@ name: Gerar Executável (Build)
 
 on:
   push:
-    branches: [ "main" ]
+    tags:
+      - 'v*'
   pull_request:
     branches: [ "main" ]
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -51,8 +55,21 @@ jobs:
         ctk_path=$(python -c "import customtkinter, os; print(os.path.dirname(customtkinter.__file__))")
         pyinstaller --windowed --onedir --name "cpu-py-linux" --add-data="${ctk_path}:customtkinter/" --add-data="src/Corinthians vinheta da Radio! Corinthians.mp3:src/" main.py
 
-    - name: Disponibilizar os Executáveis para Download
-      uses: actions/upload-artifact@v4
+    - name: Compactar o Executável (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        cd dist
+        Compress-Archive -Path "cpu-py-windows" -DestinationPath "../cpu-py-windows.zip"
+
+    - name: Compactar o Executável (Linux)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        cd dist
+        zip -r ../cpu-py-linux.zip cpu-py-linux
+
+    - name: Criar Release
+      uses: softprops/action-gh-release@v2
       with:
-        name: cpu-py-${{ matrix.os }}
-        path: dist/
+        files: cpu-py-*.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
